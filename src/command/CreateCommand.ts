@@ -32,6 +32,8 @@ export class CreateCommand implements Command {
 
     if (doc.has(id)) throw new CommandError(`id already exists: ${id}`);
     if (containerId !== null) {
+      if (!doc.has(containerId))
+        throw new CommandError(`no such container: ${containerId}`);
       const target = doc.find(containerId);
       if (!target.isContainer())
         throw new CommandError(`not a container: ${containerId}`);

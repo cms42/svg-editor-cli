@@ -64,16 +64,18 @@ export class SvgDocument {
   }
 
   private register(shape: Shape): void {
-    const ids = shape instanceof Group ? shape.walk() : [shape];
+    const ids = [...(shape instanceof Group ? shape.walk() : [shape])];
     for (const s of ids) {
-      if (this._index.has(s.id))
+      const existing = this._index.get(s.id);
+      // 同一对象重复注册（如 ungroup undo 先挂子节点再挂容器）跳过
+      if (existing !== undefined && existing !== s)
         throw new ModelError(`id already exists: ${s.id}`);
     }
     for (const s of ids) this._index.set(s.id, s);
   }
 
   private unregister(shape: Shape): void {
-    const ids = shape instanceof Group ? shape.walk() : [shape];
+    const ids = [...(shape instanceof Group ? shape.walk() : [shape])];
     for (const s of ids) this._index.delete(s.id);
   }
 

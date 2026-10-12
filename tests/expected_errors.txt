@@ -1,0 +1,28 @@
+svg-editor 0.1 — type 'help' for commands
+error: no document. use 'init' or 'read' first
+canvas 800x600 created
+rect#r1 created
+error: id already exists: r1
+error: no such shape: r9
+error: no such container: node9
+error: not a container: r1
+error: unknown shape type: hexagon (is the plugin loaded?)
+error: unknown shape type: box (is the plugin loaded?)
+g#scene created
+error: cannot ungroup top-level container: scene
+g#inner created in g#scene
+rect#a created in g#inner
+error: cannot group a container into its own descendant: inner
+g#inner ungrouped, 1 children promoted
+error: not a container: r1
+error: scale factor must be positive
+error: scale factor must be positive
+error: cannot read file: no-such-file.svg
+error: cannot write file: /no-such-dir/x.svg
+error: unknown attribute: bogus
+rect#r1 deleted
+error: no such shape: r1
+rect#r1 restored into svg
+g#inner restored
+saved to err.svg (4 elements)
+error: redo not allowed after io command

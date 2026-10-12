@@ -1,0 +1,26 @@
+# 任务书 §6.1 两节点流程图会话（含注释行）
+init 800 600
+
+# 先建容器骨架，再往里放图形：每一步都显式表达归属
+create g flowchart
+create g node1 in flowchart
+create rect start 120 100 160 60 #4a90d9 in node1
+create text start-label 155 135 "开始" in node1
+
+create g node2 in flowchart
+create rect process 520 100 160 60 #f5a623 in node2
+create text process-label 545 135 "处理数据" in node2
+
+# 连接线挂在流程图容器下
+create line arrow1 280 130 520 130 black in flowchart
+
+tree
+
+# 容器移动：整个节点 2 下移 100，文字随行（容器的价值所在）
+move node2 0 100
+undo
+
+# 改节点内容：只动组内 text
+set process-label text "处理数据 v2"
+
+save flowchart.svg

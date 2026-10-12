@@ -1,0 +1,28 @@
+# §4.2 错误信息逐条验证
+move r9 1 1
+init 800 600
+create rect r1 0 0 10 10
+create circle r1 0 0 5
+move r9 1 1
+create rect x1 0 0 1 1 in node9
+create rect x2 0 0 1 1 in r1
+create hexagon h1 0 0
+create box b1 0 0 10 10 "标题"
+create g scene
+ungroup scene
+create g inner in scene
+create rect a 0 0 1 1 in inner
+group bad inner a
+ungroup inner
+ungroup r1
+scale r1 0
+scale r1 -2
+read no-such-file.svg
+save /no-such-dir/x.svg
+set r1 bogus 1
+delete r1
+delete r1
+undo
+undo
+save err.svg
+redo
