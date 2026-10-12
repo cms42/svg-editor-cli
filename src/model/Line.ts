@@ -90,4 +90,19 @@ export class Line extends Shape {
   protected override describeSet(attr: string, raw: string): string {
     return `${attr}=${fmt(parseNumber(raw, attr))}`;
   }
+
+  protected getGeometry(attr: string): string | null {
+    switch (attr) {
+      case "x1":
+        return fmt(this._x1);
+      case "y1":
+        return fmt(this._y1);
+      case "x2":
+        return fmt(this._x2);
+      case "y2":
+        return fmt(this._y2);
+      default:
+        return null;
+    }
+  }
 }

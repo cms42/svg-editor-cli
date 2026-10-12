@@ -70,6 +70,10 @@ export class Group extends Shape {
     return false;
   }
 
+  protected getGeometry(): string | null {
+    return null;
+  }
+
   /** 深度优先遍历（先序，含自身）。 */
   *walk(): Generator<Shape> {
     yield this;

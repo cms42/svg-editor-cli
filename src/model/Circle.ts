@@ -77,4 +77,17 @@ export class Circle extends Shape {
   protected override describeSet(attr: string, raw: string): string {
     return `${attr}=${fmt(parseNumber(raw, attr))}`;
   }
+
+  protected getGeometry(attr: string): string | null {
+    switch (attr) {
+      case "cx":
+        return fmt(this._cx);
+      case "cy":
+        return fmt(this._cy);
+      case "r":
+        return fmt(this._r);
+      default:
+        return null;
+    }
+  }
 }

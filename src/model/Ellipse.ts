@@ -87,4 +87,19 @@ export class Ellipse extends Shape {
   protected override describeSet(attr: string, raw: string): string {
     return `${attr}=${fmt(parseNumber(raw, attr))}`;
   }
+
+  protected getGeometry(attr: string): string | null {
+    switch (attr) {
+      case "cx":
+        return fmt(this._cx);
+      case "cy":
+        return fmt(this._cy);
+      case "rx":
+        return fmt(this._rx);
+      case "ry":
+        return fmt(this._ry);
+      default:
+        return null;
+    }
+  }
 }

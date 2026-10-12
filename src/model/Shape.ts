@@ -86,6 +86,27 @@ export abstract class Shape {
     return `${attr}=${raw}`;
   }
 
+  /** 读取属性当前值（undo 记录旧值用）；不认识返回 null。 */
+  get(attr: string): string | null {
+    switch (attr) {
+      case "fill":
+        return this._fill;
+      case "stroke":
+        return this._stroke;
+      case "stroke-width":
+        return this._strokeWidth === null ? null : fmt(this._strokeWidth);
+      default:
+        return this.getGeometry(attr);
+    }
+  }
+
+  protected abstract getGeometry(attr: string): string | null;
+
+  /** 回显格式化（set/undo 共用）。 */
+  describeValue(attr: string, raw: string): string {
+    return this.describeSet(attr, raw);
+  }
+
   /**
    * set 白名单入口：fill / stroke / stroke-width 公共，
    * 其余交给各几何类型；不认识则抛出 unknown attribute。

@@ -87,4 +87,19 @@ export class Rect extends Shape {
   protected override describeSet(attr: string, raw: string): string {
     return `${attr}=${fmt(parseNumber(raw, attr))}`;
   }
+
+  protected getGeometry(attr: string): string | null {
+    switch (attr) {
+      case "x":
+        return fmt(this._x);
+      case "y":
+        return fmt(this._y);
+      case "width":
+        return fmt(this._width);
+      case "height":
+        return fmt(this._height);
+      default:
+        return null;
+    }
+  }
 }

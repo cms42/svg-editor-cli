@@ -86,4 +86,17 @@ export class TextShape extends Shape {
     if (attr === "text") return `text="${raw}"`;
     return `${attr}=${fmt(parseNumber(raw, attr))}`;
   }
+
+  protected getGeometry(attr: string): string | null {
+    switch (attr) {
+      case "x":
+        return fmt(this._x);
+      case "y":
+        return fmt(this._y);
+      case "text":
+        return this._text;
+      default:
+        return null;
+    }
+  }
 }
