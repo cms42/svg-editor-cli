@@ -19,6 +19,7 @@ export class CanvasAction implements Action {
     }
     const w = parseMoveNumber(this.args[0], "width");
     const h = parseMoveNumber(this.args[1], "height");
+    if (w <= 0 || h <= 0) throw new CommandError("canvas size must be positive");
     doc.resize(w, h);
     this.ctx.history.block();
     return [`canvas resized to ${w}x${h}`];

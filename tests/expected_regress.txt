@@ -1,0 +1,32 @@
+svg-editor 0.1 — type 'help' for commands
+canvas 800x600 created
+error: canvas size must be positive
+error: canvas size must be positive
+rect#r1 created
+rect#r1 moved to (5,5)
+rect#r1 moved back to (0,0)
+rect#r1 deleted
+rect#r1 created
+rect#r1 moved to (5,5)
+rect#r1  parent=svg
+  x=5 y=5 w=10 h=10
+rect#r1 updated: fill=blue
+rect#r1 updated: fill=green
+rect#r1 updated: fill=blue
+rect#r1 updated: fill=green
+text#t1 created
+text#t1  parent=svg
+  x=20 y=40 text="in"
+rect#r2 created
+rect#r2  parent=svg
+  x=0 y=0 w=5 h=5
+  fill=in
+error: invalid number for dx: 0x10
+error: invalid number for dx: Infinity
+error: duplicate id: r1
+rect#r1 deleted
+rect#r1 restored into svg
+rect#r2 deleted
+rect#r2 created
+rect#r1 deleted
+error: no such shape: r1

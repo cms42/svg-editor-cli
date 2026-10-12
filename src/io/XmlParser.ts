@@ -16,12 +16,11 @@ export class XmlElement {
     return this.children.filter((c): c is XmlElement => c instanceof XmlElement);
   }
 
-  /** 直接文本内容（拼接所有文本子节点）。 */
+  /** 直接文本内容（拼接所有文本子节点，保留首尾空格以便 round-trip）。 */
   text(): string {
     return this.children
       .filter((c): c is string => typeof c === "string")
-      .join("")
-      .trim();
+      .join("");
   }
 }
 

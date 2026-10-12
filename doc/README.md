@@ -151,6 +151,53 @@ model ..> model : 无任何外部依赖
    `canvas resized to 1024x768`、`circle#c1 scaled by 2` / undo 时
    `circle#c1 scale restored`。
 
+### 白盒测试一轮（第二轮迭代）
+
+初版通过全部黑盒回放后，又对实现做了一轮白盒审查，发现以下缺陷并修复
+（回归用例见 `tests/session_regress.txt` / `session_collide.txt` / `session_text.txt`）：
+
+1. **redo-after-create 对象身份 bug（架构层面最大的教训）**：
+   `CreateCommand.execute()` 每次经工厂**新建** Shape 实例。undo(create) 后 redo
+   会生成新对象，而 redo 栈中后续命令（move/delete/set/front…）在构造期缓存的
+   是**旧实例引用**——redo 链上回显与文档状态分裂（show 显示未移动），
+   delete 变体甚至报 `no such shape`。**根因是 Command 模式里"命令即参数化闭包"
+   与"工厂每次新建"的组合**：命令对象长期存活于两个栈中，它捕获的所有引用
+   必须指向同一份模型对象。修复：Shape 实例只在首次 execute 时创建一次，
+   undo=detach、redo=把同一实例重新 attach（天然对称）；execute 期再查一次
+   id 冲突（构造期校验后 doc 可能已变）。配套把 `History.undo/redo` 改为
+   peek-then-pop：执行失败不吞栈单元。
+2. **set fill/stroke 的 undo 抛 `invalid number for fill: blue`**：子类
+   `describeSet` 对所有属性一律 `fmt(parseNumber(raw))`，undo 回显旧值时
+   把字符串颜色当数字解析。修复：公共样式属性（fill/stroke/stroke-width）
+   的回显上移到基类 `Shape.describeValue`，几何属性才委派子类。
+3. **SvgParser.allocId 不查已占用集合**：文件含显式 `<rect id="rect1"/>` 在前、
+   无名 `<rect/>` 在后时，自动分配直接撞 id 导致整个 read 失败。
+   修复：allocId 循环自增至候选未被占用，无名分配与 duplicate-rename 共用。
+4. **`create text t1 20 40 "in"` 被误判为 in 子句**：原实现裸搜
+   `lastIndexOf("in")`。修复：按类型 schema 定位——仅当去掉尾部 `in <id>`
+   两 token 后参数个数恰好匹配该类型时才按子句解析；内容为 "in" 的 text、
+   fill 值为 "in" 均正常。
+5. **XmlParser.text() 的 `.trim()` 丢首尾空格**：save 写出的带空格 text
+   read 回来被裁掉，round-trip 不等幂。删掉 trim（全空白文本节点的过滤
+   在解析层按 `raw.trim() !== ""` 判断，不受影响）。
+6. 顺手修复的低级项：三处数字校验统一加严格字面量检查（拒绝 Infinity /
+   十六进制 / 空串）；`group` 参数重复 id 报 `error: duplicate id: <id>`；
+   `init`/`canvas` 宽高须为正（`error: canvas size must be positive`）；
+   `initStyle` 对非法 stroke-width 视为未设置。
+
+**教训总结**：黑盒 transcript 只能覆盖任务书写明的路径；undo/redo 与对象
+身份、解析器的边界输入这类问题必须靠白盒审查 + 针对性回归用例兜底。
+
+## 附录：已知边界（本轮明确不修）
+
+- `fmt` 对 |v|<5e-7 的浮点塌缩为 0（toFixed(6) 精度策略）；
+- CJK 字符作 id 时 tree 属性列按字符数而非显示宽度对齐，可能视觉不齐；
+- XML 子集不支持 CDATA、DOCTYPE；同一属性重复出现后者覆盖前者；
+- `viewBox` 读入时被忽略（save 按 width/height 重写）；
+- 未建模的属性（如 `opacity`、`transform`）round-trip 丢失；
+- `save <新路径>` 会改写 sourcePath（save-as 语义，无参数的 save 存到新路径）；
+- `help` 带多余参数不报错。
+
 ## 三、一致性自查
 
 1. **模块划分**：实际目录与 §一.1 完全一致（model/command/io/cli 四层 +
@@ -177,6 +224,12 @@ model ..> model : 无任何外部依赖
      box 未实现，无从触发，故不在矩阵中；
   4. round-trip：`read examples/other.svg → save → 再 read → tree`，
      与直接 read 的 tree 完全一致，且第二次 read 不再产生缺 id 警告
+  5. `tests/session_regress.txt`：白盒回归——redo-after-create 对象身份
+     （含 delete 变体）、set 字符串属性 undo/redo、`in` 子句误判、
+     严格数字校验、group 重复 id、画布正数校验；
+  6. `tests/session_collide.txt`：allocId 避开显式占用的 id、
+     重复显式 id 改名（`examples/collide.svg`）；
+  7. `tests/session_text.txt`：text 首尾空格 round-trip 保留。
      （验证序列化写回了分配出的 id）。
 - **类型安全**：`tsc --noEmit` strict 模式零错误（`npm run build`）。
 - **手动冒烟**：show/canvas/front/back/scale/help/交互提示符逐一试过。

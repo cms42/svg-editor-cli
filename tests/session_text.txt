@@ -1,0 +1,7 @@
+# 回归：text 首尾空格 round-trip 保留（XmlParser.text 不再 trim）
+init 100 100
+create text pad 0 0 "  padded  "
+save pad.svg
+read pad.svg
+show pad
+tree

@@ -1,4 +1,4 @@
-import { fmt } from "../model/Format";
+import { fmt, isNumericLiteral } from "../model/Format";
 import { Shape } from "../model/Shape";
 import { Command, CommandError } from "./Command";
 import { EditorContext } from "./EditorContext";
@@ -38,8 +38,7 @@ export class MoveCommand implements Command {
 }
 
 export function parseMoveNumber(raw: string, what: string): number {
-  const v = Number(raw);
-  if (raw.trim() === "" || Number.isNaN(v))
+  if (!isNumericLiteral(raw))
     throw new CommandError(`invalid number for ${what}: ${raw}`);
-  return v;
+  return Number(raw);
 }

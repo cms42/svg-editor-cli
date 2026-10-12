@@ -16,6 +16,8 @@ export class InitAction implements Action {
       throw new CommandError("usage: init [width] [height]");
     this.w = args.length === 2 ? parseMoveNumber(args[0], "width") : 800;
     this.h = args.length === 2 ? parseMoveNumber(args[1], "height") : 600;
+    if (this.w <= 0 || this.h <= 0)
+      throw new CommandError("canvas size must be positive");
   }
 
   run(): string[] {

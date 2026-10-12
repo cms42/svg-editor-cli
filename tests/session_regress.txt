@@ -1,0 +1,29 @@
+# 回归：redo-after-create 对象身份 / set 字符串 undo / in 子句误判 /
+#        严格数字 / group 重复 id / 画布正数校验
+init 800 600
+init 0 100
+canvas 0 5
+create rect r1 0 0 10 10
+move r1 5 5
+undo
+undo
+redo
+redo
+show r1
+set r1 fill blue
+set r1 fill green
+undo
+redo
+create text t1 20 40 "in"
+show t1
+create rect r2 0 0 5 5 in
+show r2
+move r1 0x10 0
+move r1 Infinity 0
+group gg r1 r1
+delete r1
+undo
+undo
+redo
+redo
+show r1

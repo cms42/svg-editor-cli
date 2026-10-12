@@ -32,9 +32,15 @@ export class SvgParser {
     const used = new Set<string>();
 
     const allocId = (tag: string): string => {
-      const next = (counters.get(tag) ?? 0) + 1;
+      // 候选 id 须未被显式 id / 已分配 id 占用
+      let next = counters.get(tag) ?? 0;
+      let candidate: string;
+      do {
+        next++;
+        candidate = `${tag}${next}`;
+      } while (used.has(candidate));
       counters.set(tag, next);
-      return `${tag}${next}`;
+      return candidate;
     };
 
     const build = (el: XmlElement, parent: Group): void => {

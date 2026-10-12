@@ -20,11 +20,14 @@ run_case() {
 }
 
 mkdir -p tests/.tmp
-cp examples/other.svg tests/.tmp/
+cp examples/other.svg examples/collide.svg tests/.tmp/
 
 run_case "§6 典型会话"      tests/session_main.txt      tests/expected_main.txt      tests/.tmp
 run_case "§6.1 流程图会话"  tests/session_flowchart.txt tests/expected_flowchart.txt tests/.tmp
 run_case "§4.2 错误矩阵"    tests/session_errors.txt    tests/expected_errors.txt    tests/.tmp
+run_case "回归:redo身份/set字符串/in子句/严格数字等" tests/session_regress.txt tests/expected_regress.txt tests/.tmp
+run_case "回归:allocId 冲突避让" tests/session_collide.txt tests/expected_collide.txt tests/.tmp
+run_case "回归:text 空格 round-trip" tests/session_text.txt tests/expected_text.txt tests/.tmp
 
 # round-trip：read other.svg → save roundtrip.svg → 再 read → tree 应与直接 read 的 tree 一致
 rt=$(cd tests/.tmp && node "$OLDPWD/dist/cli/main.js" <<'EOF'

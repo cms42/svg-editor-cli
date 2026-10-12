@@ -4,7 +4,11 @@ import { ShapeSpec } from "../model/ShapeFactory";
 import { Command, CommandError } from "./Command";
 import { EditorContext } from "./EditorContext";
 
-/** create <type> <id> [params…] [in <containerId>] */
+/**
+ * create <type> <id> [params…] [in <containerId>]
+ * Shape 实例只在首次 execute 时创建一次；undo=detach、redo=重新 attach
+ * 同一实例，保证 redo 链上的后续命令持有的对象身份不分裂。
+ */
 export class CreateCommand implements Command {
   private readonly ctx: EditorContext;
   private readonly type: string;
@@ -20,15 +24,34 @@ export class CreateCommand implements Command {
     const [type, id, ...rest] = args;
     const doc = ctx.requireDoc();
 
-    let containerId: string | null = null;
-    const inIdx = rest.lastIndexOf("in");
+    // in 子句按类型 schema 定位：去掉尾部 `in <id>` 后参数个数须恰好匹配，
+    // 否则 "in" 只是普通参数（如 text 内容 / fill 值）。
     let params = rest;
-    if (inIdx >= 0) {
-      if (inIdx !== rest.length - 2)
-        throw new CommandError("usage: create <type> <id> [params…] [in <containerId>]");
-      containerId = rest[inIdx + 1];
-      params = rest.slice(0, inIdx);
+    let containerId: string | null = null;
+    let spec: ShapeSpec | null = null;
+    if (rest.length >= 2 && rest[rest.length - 2] === "in") {
+      const candidate = rest.slice(0, -2);
+      try {
+        spec = ctx.factory.parse(type, candidate);
+        params = candidate;
+        containerId = rest[rest.length - 1];
+      } catch (e) {
+        if (!(e instanceof Error && e.message === "wrong number of arguments"))
+          throw e; // 无效数字等真实错误，不回退
+      }
     }
+    if (spec === null) {
+      try {
+        spec = ctx.factory.parse(type, params);
+      } catch (e) {
+        if (e instanceof Error && e.message === "wrong number of arguments") {
+          const usage = ctx.factory.usage(type);
+          if (usage) throw new CommandError(`usage: ${usage}`);
+        }
+        throw e;
+      }
+    }
+    this.spec = spec;
 
     if (doc.has(id)) throw new CommandError(`id already exists: ${id}`);
     if (containerId !== null) {
@@ -41,30 +64,21 @@ export class CreateCommand implements Command {
     } else {
       this.container = null;
     }
-
-    // 未知类型 / 参数错误在构造阶段抛出，不产生任何状态变化
-    try {
-      this.spec = ctx.factory.parse(type, params);
-    } catch (e) {
-      if (e instanceof Error && e.message === "wrong number of arguments") {
-        const usage = ctx.factory.usage(type);
-        if (usage) throw new CommandError(`usage: ${usage}`);
-      }
-      throw e;
-    }
     this.type = type;
     this.id = id;
   }
 
   execute(): string[] {
     const doc = this.ctx.requireDoc();
+    // 构造期校验后 doc 可能已变（redo 场景 id 被新编辑占用），执行期再查一次
+    if (doc.has(this.id)) throw new CommandError(`id already exists: ${this.id}`);
+    if (!this.shape)
+      this.shape = this.ctx.factory.create(this.type, this.id, this.spec);
     const parent = this.container ?? doc.root;
-    const shape = this.ctx.factory.create(this.type, this.id, this.spec);
-    doc.attach(shape, parent);
-    this.shape = shape;
+    doc.attach(this.shape, parent);
     if (this.container)
-      return [`${shape.label} created in ${this.container.label}`];
-    return [`${shape.label} created`];
+      return [`${this.shape.label} created in ${this.container.label}`];
+    return [`${this.shape.label} created`];
   }
 
   undo(): string[] {

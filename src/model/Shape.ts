@@ -1,4 +1,4 @@
-import { fmt } from "./Format";
+import { fmt, isNumericLiteral } from "./Format";
 import type { Group } from "./Group";
 
 export type AttrPair = [string, string];
@@ -102,9 +102,18 @@ export abstract class Shape {
 
   protected abstract getGeometry(attr: string): string | null;
 
-  /** 回显格式化（set/undo 共用）。 */
+  /** 回显格式化（set/undo 共用）：公共样式属性在此处理，几何属性委派子类。 */
   describeValue(attr: string, raw: string): string {
-    return this.describeSet(attr, raw);
+    switch (attr) {
+      case "fill":
+        return `fill=${raw}`;
+      case "stroke":
+        return `stroke=${raw}`;
+      case "stroke-width":
+        return `stroke-width=${fmt(parseNumber(raw, attr))}`;
+      default:
+        return this.describeSet(attr, raw);
+    }
   }
 
   /**
@@ -177,7 +186,11 @@ export abstract class Shape {
   initStyle(fill: string | null, stroke: string | null, strokeWidth: string | null): void {
     if (fill !== null) this._fill = fill;
     if (stroke !== null) this._stroke = stroke;
-    if (strokeWidth !== null) this._strokeWidth = parseFloat(strokeWidth);
+    if (strokeWidth !== null) {
+      const v = parseFloat(strokeWidth);
+      // 非法值视为未设置
+      if (!Number.isNaN(v) && Number.isFinite(v)) this._strokeWidth = v;
+    }
   }
 }
 
@@ -189,9 +202,8 @@ export class ModelError extends Error {
 }
 
 export function parseNumber(raw: string, what: string): number {
-  const v = Number(raw);
-  if (raw.trim() === "" || Number.isNaN(v)) {
+  if (!isNumericLiteral(raw)) {
     throw new ModelError(`invalid number for ${what}: ${raw}`);
   }
-  return v;
+  return Number(raw);
 }

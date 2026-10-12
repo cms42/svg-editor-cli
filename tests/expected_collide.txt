@@ -1,0 +1,8 @@
+svg-editor 0.1 — type 'help' for commands
+warning: assigned id rect2 to unnamed <rect>
+warning: duplicate id rect1, renamed to rect3 for <rect>
+read collide.svg (3 elements)
+svg (100x100)
+├── rect#rect1  x=1 y=1 w=2 h=2
+├── rect#rect2  x=3 y=3 w=4 h=4
+└── rect#rect3  x=5 y=5 w=6 h=6

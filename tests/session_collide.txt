@@ -1,0 +1,3 @@
+# 回归：allocId 须避开已占用的显式 id；重复显式 id 改名路径共用同一分配器
+read collide.svg
+tree

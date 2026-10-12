@@ -1,5 +1,6 @@
 import { Circle } from "./Circle";
 import { Ellipse } from "./Ellipse";
+import { isNumericLiteral } from "./Format";
 import { Group } from "./Group";
 import { Line } from "./Line";
 import { Rect } from "./Rect";
@@ -23,10 +24,9 @@ export interface ShapeType {
 function num(spec: ShapeSpec, k: string, dflt = 0): number {
   const raw = spec.attrs.get(k);
   if (raw === undefined) return dflt;
-  const v = Number(raw);
-  if (raw.trim() === "" || Number.isNaN(v))
+  if (!isNumericLiteral(raw))
     throw new ModelError(`invalid number for ${k}: ${raw}`);
-  return v;
+  return Number(raw);
 }
 
 function spec(pairs: [string, string][], text?: string): ShapeSpec {

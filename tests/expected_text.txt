@@ -1,0 +1,9 @@
+svg-editor 0.1 — type 'help' for commands
+canvas 100x100 created
+text#pad created
+saved to pad.svg (1 elements)
+read pad.svg (1 elements)
+text#pad  parent=svg
+  x=0 y=0 text="  padded  "
+svg (100x100)
+└── text#pad  (0,0) "  padded  "

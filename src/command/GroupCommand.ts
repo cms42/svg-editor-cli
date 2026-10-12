@@ -26,6 +26,11 @@ export class GroupCommand implements Command {
     const doc = ctx.requireDoc();
     const [gid, ...ids] = args;
     if (doc.has(gid)) throw new CommandError(`id already exists: ${gid}`);
+    const seen = new Set<string>();
+    for (const id of ids) {
+      if (seen.has(id)) throw new CommandError(`duplicate id: ${id}`);
+      seen.add(id);
+    }
     this.targets = ids.map((id) => doc.find(id));
     // 目标同时含某容器与其子孙 → 拒绝，报容器名
     for (const c of this.targets) {
