@@ -4,6 +4,10 @@ import { AttrPair, Shape } from "./Shape";
 export class Group extends Shape {
   private _children: Shape[] = [];
 
+  constructor(id: string) {
+    super(id);
+  }
+
   get tag(): string {
     return "g";
   }
