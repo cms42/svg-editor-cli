@@ -1,0 +1,14 @@
+{
+  "name": "svg-editor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CLI SVG editor — 软件设计 PJ1 Phase 1",
+  "scripts": {
+    "build": "tsc",
+    "cli": "npm run build --silent && node dist/cli/main.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.6.0"
+  }
+}
