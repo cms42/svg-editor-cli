@@ -130,6 +130,23 @@ export abstract class Shape {
     }
   }
 
+  /** undo 用：把样式属性还原为"未设置"。几何/文本属性必有旧值，不会走到这里。 */
+  unset(attr: string): string {
+    switch (attr) {
+      case "fill":
+        this._fill = null;
+        return "fill=(unset)";
+      case "stroke":
+        this._stroke = null;
+        return "stroke=(unset)";
+      case "stroke-width":
+        this._strokeWidth = null;
+        return "stroke-width=(unset)";
+      default:
+        throw new ModelError(`cannot unset attribute: ${attr}`);
+    }
+  }
+
   /** 序列化属性列表：id 在前，几何居中，样式居后。 */
   serializeAttrs(): AttrPair[] {
     const out: AttrPair[] = [["id", this._id], ...this.geometryAttrPairs()];

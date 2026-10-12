@@ -29,9 +29,8 @@ export class SetCommand implements Command {
 
   undo(): string[] {
     if (this.oldValue === null) {
-      // 旧值未设置：无法精确还原，按空值写回（fill/stroke 等）
-      this.shape.set(this.attr, "");
-      return [`${this.shape.label} updated: ${this.attr}=(unset)`];
+      // 旧值未设置：还原为"未设置"而非写回空串
+      return [`${this.shape.label} updated: ${this.shape.unset(this.attr)}`];
     }
     this.shape.set(this.attr, this.oldValue);
     const desc = this.shape.describeValue(this.attr, this.oldValue);
