@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    { "module": "./does-not-exist.js" },
+    { "module": "./no-default.js" },
+    { "module": "./throws-on-eval.js" },
+    { "module": "./mismatch.js" },
+    { "module": "./throws-on-activate.js" },
+    { "module": "./duplicate.js" },
+    { "module": "./code-plugin.js" }
+  ]
+}
