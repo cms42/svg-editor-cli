@@ -19,7 +19,9 @@ mkdir -p "$OUT" "$WORK/docs" "$WORK/plugins"
 printf '<svg/>' > "$WORK/demo.svg"
 printf '{}' > "$WORK/package.json"
 printf '' > "$WORK/.hidden"
-trap 'rm -rf "$TMP"' EXIT
+# cli-1 会 `save demo.svg`，产物落在会话目录；退出时一并清掉，保持素材目录干净
+cleanup() { rm -rf "$TMP"; rm -f "$ROOT/doc/transcript/demo.svg"; }
+trap cleanup EXIT
 
 fail=0
 CONFIG="$ROOT/plugins.config.json"
