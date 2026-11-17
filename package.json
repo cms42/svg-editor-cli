@@ -2,10 +2,12 @@
   "name": "svg-editor",
   "version": "0.1.0",
   "private": true,
-  "description": "CLI SVG editor — 软件设计 PJ1 Phase 1",
+  "description": "CLI SVG editor with a plugin architecture — 软件设计 PJ1 Phase 2",
   "scripts": {
     "build": "tsc",
-    "cli": "npm run build --silent && node dist/cli/main.js"
+    "cli": "npm run build --silent && node dist/cli/main.js",
+    "test": "npm run build --silent && node --test tests/*.test.cjs && bash tests/run.sh && bash tests/dual-assembly.sh",
+    "metrics": "node scripts/metrics.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

@@ -1,0 +1,9 @@
+{
+  "name": "@svgframe/plugin-shape-diamond",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "contributes": {
+    "shapes": ["diamond"]
+  }
+}

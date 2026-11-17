@@ -1,0 +1,22 @@
+{
+  "plugins": [
+    {
+      "module": "./dist/plugins/shape-box/index.js"
+    },
+    {
+      "module": "./dist/plugins/tree-star/index.js"
+    },
+    {
+      "module": "./dist/plugins/stats/index.js"
+    },
+    {
+      "module": "./dist/plugins/dir/index.js"
+    },
+    {
+      "module": "./dist/plugins/shape-diamond/index.js",
+      "options": {
+        "fill": "#f5a623"
+      }
+    }
+  ]
+}
