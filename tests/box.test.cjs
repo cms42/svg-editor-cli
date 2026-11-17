@@ -180,6 +180,29 @@ test("处理器部分修改后抛错：文档与 undo 历史都不变", () => {
   assert.deepStrictEqual(h.run("undo"), ["box#n1 deleted"]);
 });
 
+test("多个处理器同时命中：先注册者优先，不组合执行", () => {
+  const h = withBox();
+  h.run("init 10 10");
+  h.run('create box n1 0 0 100 40 "A"');
+  const box = h.ctx.doc.find("n1");
+
+  const calls = [];
+  h.ctx.attributes.register({
+    name: "late",
+    handles: (s, attr) => s === box && attr === "fill",
+    apply(_s, _a, value, tx) {
+      calls.push("late");
+      tx.set(box.boxRect, "fill", "late-" + value);
+      return { line: "late applied", undoLine: "late undone" };
+    },
+  });
+
+  // box 插件先注册，因此 fill 仍由 BoxAttributeHandler 处理
+  h.run("set n1 fill red");
+  assert.strictEqual(box.boxRect.fill, "red");
+  assert.deepStrictEqual(calls, []);
+});
+
 // ---------- 不变量：子部件不可单独摘下 ----------
 
 test("ungroup 拒绝复合图形", () => {

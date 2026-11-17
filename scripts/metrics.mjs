@@ -76,7 +76,7 @@ function classify(file) {
 
 function countLines(text) {
   if (text === "") return { total: 0, code: 0, comment: 0, blank: 0 };
-  const lines = text.split("\n");
+  const lines = text.replace(/\n$/, "").split("\n");
   let code = 0;
   let comment = 0;
   let blank = 0;
