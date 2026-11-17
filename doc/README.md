@@ -387,16 +387,73 @@ bash tests/dual-assembly.sh
 分别在 A、B 两种装配下执行，**输出逐字节相同**；同一脚本还把"禁用新增插件"时的
 输出与 `tests/expected_main.txt`（Phase 1 提交时的逐字节快照）比较。
 
-差异判据（接入 `diamond` 的那次提交 `chore: 移除 Phase 1 的旧目录…`）：
+#### 方式 A 的差异判据（分支 `demo-assembly-a`）
+
+接入新插件的那次提交：
 
 ```bash
-# 排除新增插件包之后，内核与既有插件的差异必须为空
-git diff 31c71cd^ 31c71cd --name-status -- src/kernel src/builtin src/plugins/stats \
-  src/plugins/dir src/plugins/shape-box src/plugins/tree-star ':(exclude)src/plugins/shape-diamond'
-# → 无输出
-
-# 方式 B 下该提交连运行代码都不用改，只在配置文件加一项
+git show --name-status --format="%s" demo-assembly-a
+# demo(assembly-a): diamond 经代码装配接入
+# M	src/assembly/PluginSet.ts
 ```
+
+只改了一个顶层装配文件（`src/assembly/PluginSet.ts` 加一行 `activate`），
+其余按任务书的排除法验证内核与既有插件差异为空：
+
+```bash
+git diff demo-assembly-a^ demo-assembly-a --name-status -- \
+  src/kernel src/builtin src/plugins/stats src/plugins/dir \
+  src/plugins/shape-box src/plugins/tree-star
+# → 无输出
+```
+
+分支上实跑确认生效：
+
+```text
+svg> create diamond d1 100 50 80 40
+diamond#d1 created
+svg> tree
+svg (200x100) *
+└── polygon#d1  points=100,30 140,50 100,70 60,50 fill=#f5a623 *
+```
+
+该分支是**演示分支**，不合并进 `main`（`main` 里 diamond 走的是配置装配）。
+
+#### 方式 B 的差异判据（`main` 的 `31c71cd`）
+
+`main` 上接入 `diamond` 的提交 `31c71cd`：
+
+```bash
+git show --name-status -M --format="" 31c71cd
+```
+
+输出只有五类行，逐项可核：
+
+```
+M   package.json                                                  # 依赖元数据
+A   plugins.config.json                                           # 方式 B 的配置
+R100 src/io/XmlParser.ts → src/kernel/io/XmlParser.ts             # 纯改名，内容零变化
+A   src/plugins/shape-diamond/{index.ts,PolygonShape.ts,package.json}
+D   src/{model,io,command}/…                                      # Phase 1 旧目录清理（15 个）
+```
+
+即：**内核与既有插件（builtin / stats / dir / shape-box / tree-star）没有任何
+内容修改**（没有 `M` 行）。`R100` 表示相似度 100% 的纯改名，
+用 `git diff 31c71cd^:src/io/XmlParser.ts 31c71cd:src/kernel/io/XmlParser.ts` 可验证为空 diff。
+
+若按任务书的路径过滤方式执行：
+
+```bash
+git diff -M 31c71cd^ 31c71cd --name-status -- src/kernel src/builtin \
+  src/plugins/stats src/plugins/dir src/plugins/shape-box src/plugins/tree-star \
+  ':(exclude)src/plugins/shape-diamond'
+# → A  src/kernel/io/XmlParser.ts
+```
+
+这一行是上一条 `R100` 的**一半**：改名目标在过滤范围内、源文件在范围外，
+Git 无法配对所以显示为 `A`。用 `git show -M`（不过滤路径）就能看到它是改名。
+另需注意任务书提醒的陷阱：路径写错时 Git 返回空结果，**空输出本身不能作为通过依据**，
+所以要同时确认路径存在、并核对文件内容确实未变。
 
 ## 4. ADR
 
@@ -800,6 +857,7 @@ handler 部分修改后抛错（回滚 + 历史不变）、manifest 不符（整
 | VSCode 截图 | `docs/images/vscode-svg-badge.jpg`、`vscode-svg-outline.jpg` | 扩展开发宿主实机截取 |
 | Phase 1 输出快照 | `tests/expected_*.txt` | Phase 1 提交时留存 |
 | 配置装配示例 | `plugins.config.json` | 含 `options` 与 `enabled` 用法 |
+| 方式 A 演示分支 | `demo-assembly-a` | 只改 `PluginSet.ts` 一行接入 diamond |
 | 加载器失败样例 | `tests/fixtures/*.js` + `config-failures.json` | 五种失败情形各一个模块 |
 
 ## 已知边界（本阶段明确不做）
