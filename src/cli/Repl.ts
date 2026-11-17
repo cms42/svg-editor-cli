@@ -1,19 +1,22 @@
-import { ModelError } from "../model/Shape";
-import { CommandError } from "../command/Command";
-import { CommandRegistry } from "../command/CommandRegistry";
-import { EditorContext } from "../command/EditorContext";
+import { ModelError } from "../kernel/model/Shape";
+import { CommandError } from "../kernel/api/Command";
+import type { EditorContext } from "../kernel/core/EditorContext";
 import { tokenize, TokenizeError } from "./tokenize";
 
 /**
  * REPL：提示符 `svg>`（仅交互终端显示），`#` 开头行为注释，
  * 错误统一 `error:` 前缀，命令失败不改变任何状态。
+ *
+ * 本类只做"读一行 → 分词 → 交给注册表分发"。它不认识任何具体命令，
+ * 因此新增命令插件不需要改这里。
  */
 export class Repl {
-  private readonly ctx = new EditorContext();
-  private readonly registry = CommandRegistry.builtin();
   private readonly out: (line: string) => void;
 
-  constructor(out: (line: string) => void = (l) => console.log(l)) {
+  constructor(
+    private readonly ctx: EditorContext,
+    out: (line: string) => void = (l) => console.log(l)
+  ) {
     this.out = out;
   }
 
@@ -35,7 +38,7 @@ export class Repl {
     const [name, ...args] = tokens;
     if (name === "exit" || name === "quit") return false;
     try {
-      const lines = this.registry.dispatch(this.ctx, name, args);
+      const lines = this.ctx.commands.dispatch(this.ctx, name, args);
       for (const l of lines) this.out(l);
     } catch (e) {
       if (e instanceof CommandError || e instanceof ModelError) {
