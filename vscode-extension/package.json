@@ -1,0 +1,40 @@
+{
+  "name": "svg-outline",
+  "displayName": "SVG Outline & Badge",
+  "description": "在 Explorer 中为 .svg 文件显示 [] 标记，并在原生大纲视图中展示 SVG 元素层级",
+  "version": "1.0.0",
+  "publisher": "svgframe",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:svg",
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "svg",
+        "extensions": [
+          ".svg"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "tsc -p ./ && node --test test/*.test.cjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.6.0"
+  }
+}

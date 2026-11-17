@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="220" viewBox="0 0 520 220">
+  <g id="flow">
+    <rect id="start" x="30" y="70" width="120" height="60" fill="#4a90d9"/>
+    <text x="55" y="105" fill="white">Start</text>
+    <line id="edge" x1="150" y1="100" x2="250" y2="100" stroke="black"/>
+    <g id="node2">
+      <rect id="end" x="250" y="70" width="120" height="60" fill="#f5a623"/>
+      <text x="275" y="105" fill="white">End</text>
+    </g>
+  </g>
+  <text x="30" y="200">no id element</text>
+</svg>
