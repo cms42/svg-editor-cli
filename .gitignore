@@ -2,3 +2,7 @@ node_modules/
 dist/
 *.svg
 !examples/*.svg
+!doc/transcript/fixtures/*.svg
+!vscode-extension/examples/*.svg
+vscode-extension/out/
+vscode-extension/node_modules/
