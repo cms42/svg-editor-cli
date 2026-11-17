@@ -1,0 +1,9 @@
+# 新增命令会话：stats 与 dir（工作目录 = fixtures/workdir）
+init 400 300
+create g g1
+create rect r1 10 10 40 20 #4a90d9 in g1
+create text t1 14 24 "A" in g1
+create circle c1 100 100 15 red
+stats
+
+dir
