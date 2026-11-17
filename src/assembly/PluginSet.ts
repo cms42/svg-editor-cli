@@ -4,6 +4,7 @@ import boxPlugin from "../plugins/shape-box";
 import statsPlugin from "../plugins/stats";
 import dirPlugin from "../plugins/dir";
 import starPlugin from "../plugins/tree-star";
+import diamondPlugin from "../plugins/shape-diamond";
 
 /**
  * 装配方式 A：代码装配（组合根）。
@@ -23,4 +24,5 @@ export function codeAssembly(editor: Editor): void {
   editor.host.activate(starPlugin); // TreeDecorator
   editor.host.activate(statsPlugin); // Command
   editor.host.activate(dirPlugin); // Command（经适配器访问文件系统）
+  editor.host.activate(diamondPlugin); // 拓展任务：判断框（ShapeProvider）
 }
